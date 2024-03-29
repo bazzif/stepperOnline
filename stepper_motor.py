@@ -1,4 +1,5 @@
 import threading
+import time
 import RPi.GPIO as GPIO
 
 class StepperMotor:
@@ -10,10 +11,12 @@ class StepperMotor:
             GPIO.setmode(GPIO.BCM)
             StepperMotor.gpio_initialized = True
 
-    def __init__(self, enable_pin, direction_pin, step_pin):
+    def _init_(self, enable_pin, direction_pin, step_pin, rpm = 10, steps = 200):
         self.enable_pin = enable_pin
         self.direction_pin = direction_pin
         self.step_pin = step_pin
+        self.rpm = rpm
+        self.delay = 1/(steps*rpm)
 
         StepperMotor.setup_gpio()
 
@@ -35,6 +38,9 @@ class StepperMotor:
 
     def set_direction(self, direction):
         self.direction = direction
+    
+    def set_rpm(sefl,rpm):
+        self.rpm = rpm
 
     def move(self, steps):
         self.steps_to_move = steps
@@ -47,12 +53,12 @@ class StepperMotor:
                 GPIO.output(self.direction_pin, GPIO.HIGH)
             elif self.direction == "counterclockwise":
                 GPIO.output(self.direction_pin, GPIO.LOW)
-            
+        
             for _ in range(self.steps_to_move):
                 GPIO.output(self.step_pin, GPIO.HIGH)
-                time.sleep(0.001)  # Adjust as needed
+                time.sleep(self.delay)  # Adjust as needed
                 GPIO.output(self.step_pin, GPIO.LOW)
-                time.sleep(0.001)  # Adjust as needed
+                time.sleep(self.delay)  # Adjust as needed
 
             self.steps_to_move = 0  # Reset steps to move
             self.move_event.clear()  # Clear the event to indicate movement is done
