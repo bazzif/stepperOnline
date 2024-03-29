@@ -1,6 +1,6 @@
 import time
 import RPi.GPIO as GPIO
-from stepper import StepperMotor
+from stepper_motor import StepperMotor
 # define pins
 
 
